@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webserver-flask-deployment
+  labels:
+    app: flask
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: flask
+  template:
+    metadata:
+      labels:
+        app: flask
+    spec:
+      containers:
+      - name: flask
+        image: d0ck3r3and0/example_devops:latest
+        ports:
+        - containerPort: 80
+        imagePullPolicy: "Always"
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: webserver-flask-deployment
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 80
+  selector:
+    app: flaskapp
