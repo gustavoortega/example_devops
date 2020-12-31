@@ -14,6 +14,22 @@ jobs:
         dockerfile: ./Dockerfile
         tags: "latest,${{ github.sha }}"
 
+    - name: Login
+      uses: okteto/login@master
+      with:
+        token: ${{ secrets.OKTETO_TOKEN }}
+
+    - name: Activate Namespace
+      uses: okteto/namespace@master
+      with:
+        namespace: gustavoortega
+    
+    - name: Deploy App
+      uses: okteto/apply@master
+      with:
+        namespace: gustavoortega
+        manifest: deployment/deployment.yaml
+
     - name: Deploy to Cluster
       uses: steebchen/kubectl@master
       env:
@@ -21,10 +37,13 @@ jobs:
       with:
         args: set image --record deployment/nginx-deployment nginx=d0ck3r3and0/example_devops:${{ github.sha }}
     
-    - name: Verify Deployment
-      uses: steebchen/kubectl@master
-      env:
-        KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
-        KUBECTL_VERSION: "1.15"
+    - name: Sleep for 30 seconds
+      uses: jakejarvis/wait-action@v0.1.0
       with:
-        args: '"rollout status deployment/nginx-deployment"'
+        time: '30s'
+    
+    - name: Verify
+      uses: srt32/uptime@v0.2
+      with:
+        url-to-hit: "https://nginx-deployment-gustavoortega.cloud.okteto.net/"
+        expected-statuses: "200"
