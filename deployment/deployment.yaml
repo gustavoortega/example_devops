@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: webserver-flask-deployment
+  name: nginx-deployment
   labels:
-    app: flask
+    app: nginx
 spec:
-  replicas: 4
+  replicas: 3
   selector:
     matchLabels:
-      app: flask
+      app: nginx
   template:
     metadata:
       labels:
-        app: flask
+        app: nginx
     spec:
       containers:
-      - name: flask
-        image: d0ck3r3and0/example_devops:latest
+      - name: nginx
+        image: d0ck3r3and0/example_devops:latest 
         ports:
         - containerPort: 80
         imagePullPolicy: "Always"
@@ -25,11 +25,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: webserver-flask-deployment
+  name: nginx-deployment
 spec:
-  type: LoadBalancer
+  type: LoadBalancer 
   ports:
     - name: http
       port: 80
   selector:
-    app: flaskapp
+    app: nginx
