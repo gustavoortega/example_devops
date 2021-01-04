@@ -2,7 +2,7 @@ name: Redeploy for avoiding Okteto sleep
 on:
   schedule:
     # * is a special character in YAML so you have to quote this string
-    - cron:  '* * * * *'
+    - cron:  '0 0 * * *'
 jobs:
   build:
     runs-on: ubuntu-latest
