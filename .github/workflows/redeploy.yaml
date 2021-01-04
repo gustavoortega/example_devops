@@ -1,0 +1,43 @@
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '*/15 * * * *'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    
+    - name: Login
+      uses: okteto/login@master
+      with:
+        token: ${{ secrets.OKTETO_TOKEN }}
+
+    - name: Activate Namespace
+      uses: okteto/namespace@master
+      with:
+        namespace: gustavoortega
+    
+    - name: Deploy App
+      uses: okteto/apply@master
+      with:
+        namespace: gustavoortega
+        manifest: deployment/deployment.yaml
+
+    - name: Deploy to Cluster
+      uses: steebchen/kubectl@master
+      env:
+        KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+      with:
+        args: set image --record deployment/nginx-deployment nginx=d0ck3r3and0/example_devops:latest
+    
+    - name: Sleep for 30 seconds
+      uses: jakejarvis/wait-action@v0.1.0
+      with:
+        time: '30s'
+    
+    - name: Verify
+      uses: srt32/uptime@v0.2
+      with:
+        url-to-hit: "https://nginx-deployment-gustavoortega.cloud.okteto.net/"
+        expected-statuses: "200"
